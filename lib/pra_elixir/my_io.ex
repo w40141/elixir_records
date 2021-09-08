@@ -1,4 +1,4 @@
-defmodule PreElixir.MyIO do
+defmodule PraElixir.MyIO do
   def one_integer do
     IO.read(:line) |> String.trim() |> String.to_integer()
   end
