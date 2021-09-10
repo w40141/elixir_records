@@ -49,6 +49,8 @@ defmodule PraElixir.BookSearch do
   def process(keyword) do
     fetch(keyword)
     |> decode_response()
+    |> get_items()
+    |> Enum.map(& get_items(&1))
   end
 
   def parse_args(argv) do
@@ -63,5 +65,13 @@ defmodule PraElixir.BookSearch do
 
   def args_to_internal_representation(_) do
     :help
+  end
+
+  def get_items(map_json) do
+    map_json["items"]
+  end
+
+  def get_book_info(list_json) do
+    list_json["volumeInfo"]
   end
 end

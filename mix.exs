@@ -27,4 +27,10 @@ defmodule PraElixir.MixProject do
       {:jason, "~> 1.2.2"}
     ]
   end
+
+  # defp escript_config do
+  #   [
+  #     main_module: Issues.CLI
+  #   ]
+  # end
 end
