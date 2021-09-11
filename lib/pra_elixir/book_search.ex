@@ -40,18 +40,6 @@ defmodule PraElixir.BookSearch do
     |> process
   end
 
-  def process(:help) do
-    IO.puts("""
-    usage: issues <keyword>
-    """)
-  end
-
-  def process(keyword) do
-    fetch(keyword)
-    |> decode_response()
-    |> table_formatter()
-  end
-
   def parse_args(argv) do
     OptionParser.parse(argv, switches: [help: :boolean], aliases: [h: :help])
     |> elem(1)
@@ -66,6 +54,18 @@ defmodule PraElixir.BookSearch do
     :help
   end
 
+  def process(:help) do
+    IO.puts("""
+    usage: issues <keyword>
+    """)
+  end
+
+  def process(keyword) do
+    fetch(keyword)
+    |> decode_response()
+    |> table_formatter()
+  end
+
   def table_formatter(response_decoded) do
     convert_json_to_list(response_decoded)
   end
@@ -73,7 +73,7 @@ defmodule PraElixir.BookSearch do
   defp convert_json_to_list(response_decoded) do
     response_decoded
     |> get_items()
-    |> get_books_info
+    |> get_books_info()
   end
 
   defp get_items(map) do
@@ -81,8 +81,16 @@ defmodule PraElixir.BookSearch do
   end
 
   defp get_books_info(list) do
-    Enum.map(list, fn x -> x["volumeInfo"] end)
+    Enum.map(list, fn x -> filter_book_info(x["volumeInfo"]) end)
   end
+
+  defp filter_book_info(map) do
+    Map.take(map, ["authors", "title", "pageCount", "industryIdentifiers"])
+  end
+
+  # defp filter_isbn(industryIdentifiers) do
+  #   
+  # end
 
   def print_table_for_columns(rows, headers) do
     with data_by_columns = split_into_columns(rows, headers),
