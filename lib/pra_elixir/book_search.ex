@@ -11,11 +11,11 @@ defmodule PraElixir.BookSearch do
     |> handle_response()
   end
 
-  def books_search_url(keyword) do
+  defp books_search_url(keyword) do
     "https://www.googleapis.com/books/v1/volumes?q=#{keyword}"
   end
 
-  def handle_response({_, %{status_code: status_code, body: body}}) do
+  defp handle_response({_, %{status_code: status_code, body: body}}) do
     Logger.info("Got response: status code=#{status_code}")
 
     {
@@ -24,12 +24,12 @@ defmodule PraElixir.BookSearch do
     }
   end
 
-  def check_for_error(200), do: :ok
-  def check_for_error(_), do: :error
+  defp check_for_error(200), do: :ok
+  defp check_for_error(_), do: :error
 
-  def decode_response({:ok, body}), do: body
+  defp decode_response({:ok, body}), do: body
 
-  def decode_response({:error, error}) do
+  defp decode_response({:error, error}) do
     IO.puts("Error fetching from Github: #{error["message"]}")
     System.halt(2)
   end
@@ -49,8 +49,7 @@ defmodule PraElixir.BookSearch do
   def process(keyword) do
     fetch(keyword)
     |> decode_response()
-    |> get_items()
-    |> Enum.map(& get_items(&1))
+    |> table_formatter()
   end
 
   def parse_args(argv) do
@@ -59,19 +58,75 @@ defmodule PraElixir.BookSearch do
     |> args_to_internal_representation()
   end
 
-  def args_to_internal_representation([keyword]) do
+  defp args_to_internal_representation([keyword]) do
     {keyword}
   end
 
-  def args_to_internal_representation(_) do
+  defp args_to_internal_representation(_) do
     :help
   end
 
-  def get_items(map_json) do
-    map_json["items"]
+  def table_formatter(response_decoded) do
+    convert_json_to_list(response_decoded)
   end
 
-  def get_book_info(list_json) do
-    list_json["volumeInfo"]
+  defp convert_json_to_list(response_decoded) do
+    response_decoded
+    |> get_items()
+    |> get_books_info
+  end
+
+  defp get_items(map) do
+    map["items"]
+  end
+
+  defp get_books_info(list) do
+    Enum.map(list, fn x -> x["volumeInfo"] end)
+  end
+
+  def print_table_for_columns(rows, headers) do
+    with data_by_columns = split_into_columns(rows, headers),
+         column_widths = widths_of(data_by_columns),
+         format = format_for(column_widths) do
+      puts_one_line_in_columns(headers, format)
+      IO.puts(separator(column_widths))
+      puts_in_columns(data_by_columns, format)
+    end
+  end
+
+  def split_into_columns(rows, headers) do
+    for header <- headers do
+      for row <- rows, do: printable(row[header])
+    end
+  end
+
+  def printable(str) when is_binary(str), do: str
+  def printable(str), do: to_string(str)
+
+  def widths_of(columns) do
+    for column <- columns do
+      column
+      |> Enum.map(&String.length/1)
+      |> Enum.max()
+    end
+  end
+
+  def format_for(column_widths) do
+    Enum.map_join(column_widths, " | ", fn width -> "~-#{width}s" end) <> "~n"
+  end
+
+  def separator(column_widths) do
+    Enum.map_join(column_widths, "-+-", fn width -> List.duplicate("-", width) end)
+  end
+
+  def puts_in_columns(data_by_columns, format) do
+    data_by_columns
+    |> List.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.each(&puts_one_line_in_columns(&1, format))
+  end
+
+  def puts_one_line_in_columns(fields, format) do
+    :io.format(format, fields)
   end
 end
