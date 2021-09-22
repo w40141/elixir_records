@@ -15,4 +15,18 @@ defmodule PraElixir.PreMath do
   defp _fb(_, 0, _), do: "Fizz"
   defp _fb(_, _, 0), do: "Buzz"
   defp _fb(n, _, _), do: n
+
+  def sum(n) do
+    1..n
+    |> Enum.reduce(0, fn x, acc -> acc + x end)
+  end
+
+  def pipe(n) do
+    n
+    |> times(2)
+    |> add_one
+  end
+  def times(n, m), do: n * m
+  def add_one(n), do: n + 1
+
 end
