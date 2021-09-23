@@ -24,7 +24,8 @@ defmodule PraElixir.MixProject do
     [
       {:httpoison, "~> 1.8.0"},
       {:poison, "~> 5.0.0"},
-      {:jason, "~> 1.2.2"}
+      {:jason, "~> 1.2.2"},
+      {:stream_data, ">= 0.0.0"},
     ]
   end
 

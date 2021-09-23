@@ -1,6 +1,6 @@
-defmodule PreElixir do
+defmodule PraElixir do
   @moduledoc """
-  Documentation for `PreElixir`.
+  Documentation for `PraElixir`.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule PreElixir do
 
   ## Examples
 
-      iex> PreElixir.hello()
+      iex> PraElixir.hello()
       :world
 
   """

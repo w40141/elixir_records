@@ -1,4 +1,4 @@
-defmodule PraElixir.PreMath do
+defmodule PraElixir.PraMath do
   def fib(n) when 0 >= n, do: 0
   def fib(1), do: 1
   def fib(n), do: fib(n - 1) + fib(n - 2)
